@@ -7,8 +7,10 @@ from nltk.stem import PorterStemmer
 from nltk.corpus import stopwords 
 
 docID_cntr = 1
+doc_cntr = 0
 title_docID = {}
 inverted_index = {}
+block = 0
 stop_words = set(stopwords.words('english'))
 
 
@@ -71,6 +73,11 @@ class Document(object):
               self.processCategory(self.category)
               # self.processLinks(self.links, self.docID)
               self.processReferences(self.references)
+              if(self.doc_cntr == 0)
+                dumpIndex()
+                doc_cntr=0
+              else:
+                doc_cntr += 1
 
         
         def processTitle(self, title):
@@ -155,7 +162,27 @@ class Document(object):
                         posting[tag] += 1
                         posting_list[docID] = posting
                         inverted_index[term] = posting_list
-                      
+
+ def dumpIndex():
+      global inverted_index, block
+      fileName = 'block' + str(block) + '.txt'
+      with open(fileName,"w+") as f:
+      terms = sorted(inverted_index.keys())
+      for term in terms:
+        posting_string = ""
+        docIDs = sorted(inverted_index[term].keys())
+        for docID in docIDs:
+          posting =  inverted_index[term][docID]
+          doc_string = "$d:" + str(docID) + "|f:" + str(posting['freq']) + "|t:" + str(posting['t']) +  
+                           "|i:" + str(posting['i']) + "|b:" + str(posting['b']) + 
+                           "|c:" + str(posting['c']) + "|l:" + str(posting['l']) + "|r:" + str(posting['r']) + "$"
+          posting_string += doc_string
+        posting_string = term + "#" + posting_string
+        f.write(posting_string + "\n")
+      inverted_index = {}
+      f.close()
+
+
                       
             
 
@@ -166,6 +193,7 @@ def test(tag,values):
     with open(fileName,"w+") as f:
               for item in values:
                 f.write(item)
+    f.close()
 
 def main():
     global termID_cntr, docID_cntr, term_termID, title_docID
